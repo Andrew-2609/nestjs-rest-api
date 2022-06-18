@@ -18,6 +18,10 @@ export class UserService {
     return this.users.find((user) => user.username === username);
   }
 
+  public getByKey(key: string, value: string): User {
+    return this.users.find((user) => user[key] === value);
+  }
+
   public create(user: User): User {
     this.users.push(user);
     return user;
