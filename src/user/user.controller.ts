@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -12,7 +20,11 @@ export class UserController {
   }
 
   @Post()
-  create(@Body() user: User): User {
-    return this.userService.create(user);
+  create(@Body() user: User, @Res() res): void {
+    const createdUser = this.userService.create(user);
+    res
+      .status(HttpStatus.CREATED)
+      .location(`/users/${createdUser.username}`)
+      .json(createdUser);
   }
 }
