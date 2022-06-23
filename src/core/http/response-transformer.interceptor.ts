@@ -19,8 +19,8 @@ export class ResponseTransformerInterceptor implements NestInterceptor {
 
   intercept(
     context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+    next: CallHandler<unknown>,
+  ): Observable<unknown> | Promise<Observable<unknown>> {
     return next.handle().pipe(
       map((controllerResponse: NestResponse) => {
         if (controllerResponse instanceof NestResponse) {
@@ -29,13 +29,7 @@ export class ResponseTransformerInterceptor implements NestInterceptor {
 
           const { status, headers, body } = controllerResponse;
 
-          // Location, Owner, etc.
-          const headerNames = Object.getOwnPropertyNames(headers);
-
-          headerNames.forEach((headerName) => {
-            const headerValue = headers[headerName];
-            this.httpAdapter.setHeader(response, headerName, headerValue);
-          });
+          this.setHeadersByName(headers, response);
 
           this.httpAdapter.status(response, status);
 
@@ -45,5 +39,15 @@ export class ResponseTransformerInterceptor implements NestInterceptor {
         return controllerResponse;
       }),
     );
+  }
+
+  private setHeadersByName(headers: unknown, response: unknown): void {
+    // Location, Owner, etc.
+    const headerNames = Object.getOwnPropertyNames(headers);
+
+    headerNames.forEach((headerName) => {
+      const headerValue = headers[headerName];
+      this.httpAdapter.setHeader(response, headerName, headerValue);
+    });
   }
 }
