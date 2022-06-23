@@ -1,12 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
+import { NestResponse } from 'src/core/http/nest-response';
+import { NestResponseBuilder } from 'src/core/http/nest-response-builder';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -20,11 +14,12 @@ export class UserController {
   }
 
   @Post()
-  create(@Body() user: User, @Res() res): void {
+  create(@Body() user: User): NestResponse {
     const createdUser = this.userService.create(user);
-    res
-      .status(HttpStatus.CREATED)
-      .location(`/users/${createdUser.username}`)
-      .json(createdUser);
+    return new NestResponseBuilder()
+      .withStatus(HttpStatus.CREATED)
+      .withHeaders({ Location: `/users/${createdUser.username}` })
+      .withBody(createdUser)
+      .build();
   }
 }
